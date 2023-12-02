@@ -13,3 +13,4 @@ pub fn lines_from_file(filename: impl AsRef<Path>) -> Vec<String> {
 }
 
 pub mod day01;
+pub mod day02;
