@@ -80,7 +80,7 @@ impl From<&str> for Game {
                 .split("; ")
                 .map(|reveal| {
                     reveal.split(", ").fold((0, 0, 0), |mut rgb, color| {
-                        let mut i = color.split(" ");
+                        let mut i = color.split(' ');
                         let count: u32 = i.next().unwrap().trim().parse().unwrap();
                         match i.next() {
                             Some("red") => rgb.0 += count,
