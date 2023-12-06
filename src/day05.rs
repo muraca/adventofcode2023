@@ -124,40 +124,17 @@
 /// So, the lowest location number in this example is 35.
 ///
 /// What is the lowest location number that corresponds to any of the initial seed numbers?
-pub fn day05_problem1(input: Vec<String>) -> u32 {
+pub fn day05_problem1(input: Vec<String>) -> u64 {
     let mut it = input.iter();
 
-    let mut current: Vec<u32> = it
+    let mut current: Vec<u64> = it
         .next()
         .unwrap()
         .split_whitespace()
         .filter_map(|s| s.parse().ok())
         .collect();
 
-    for _ in 0..8 {
-        let section = it
-            .by_ref()
-            .take_while(|l| !l.is_empty())
-            .filter_map(|l| {
-                let mut it = l.split_whitespace().filter_map(|s| s.parse::<u32>().ok());
-                match (it.next(), it.next(), it.next()) {
-                    (Some(a), Some(b), Some(c)) => Some((a, b, c)),
-                    _ => None,
-                }
-            })
-            .collect::<Vec<_>>();
-
-        current.iter_mut().for_each(|c| {
-            for s in &section {
-                if *c >= s.1 && *c < s.1 + s.2 {
-                    *c = s.0 + (*c - s.1);
-                    break;
-                }
-            }
-        });
-    }
-
-    current.into_iter().min().unwrap()
+    solve(&mut it, &mut current)
 }
 
 #[test]
@@ -172,4 +149,85 @@ fn day05_problem1_test() {
 fn day05_problem1_solution() {
     let solution = day05_problem1(crate::lines_from_file("inputs/05.txt"));
     println!("Solution for day 05 problem 1: {}", solution);
+}
+
+fn solve(it: &mut std::slice::Iter<String>, current: &mut Vec<u64>) -> u64 {
+    println!("Current len: {}", current.len());
+    for _ in 0..8 {
+        let section = it
+            .by_ref()
+            .take_while(|l| !l.is_empty())
+            .filter_map(|l| {
+                let mut it = l.split_whitespace().filter_map(|s| s.parse::<u64>().ok());
+                match (it.next(), it.next(), it.next()) {
+                    (Some(a), Some(b), Some(c)) => Some((a, b, b + c)), // source, dest_start, dest_end
+                    _ => {
+                        println!("{l}",);
+                        None
+                    }
+                }
+            })
+            .collect::<Vec<_>>();
+
+        current.iter_mut().for_each(|c| {
+            for s in &section {
+                if *c >= s.1 && *c < s.2 {
+                    *c = s.0 + (*c - s.1);
+                    break;
+                }
+            }
+        });
+    }
+
+    *current.into_iter().min().unwrap()
+}
+
+/// Everyone will starve if you only plant such a small number of seeds.
+/// Re-reading the almanac, it looks like the seeds: line actually describes ranges of seed numbers.
+///
+/// The values on the initial seeds: line come in pairs. Within each pair, the first value is the start of
+/// the range and the second value is the length of the range. So, in the first line of the example above:
+/// `seeds: 79 14 55 13`
+/// This line describes two ranges of seed numbers to be planted in the garden.
+/// The first range starts with seed number 79 and contains 14 values: 79, 80, ..., 91, 92.
+/// The second range starts with seed number 55 and contains 13 values: 55, 56, ..., 66, 67.
+///
+/// Now, rather than considering four seed numbers, you need to consider a total of 27 seed numbers.
+///
+/// In the above example, the lowest location number can be obtained from seed number 82,
+/// which corresponds to soil 84, fertilizer 84, water 84, light 77, temperature 45, humidity 46, and location 46.
+/// So, the lowest location number is 46.
+///
+/// Consider all of the initial seed numbers listed in the ranges on the first line of the almanac.
+/// What is the lowest location number that corresponds to any of the initial seed numbers?
+pub fn day05_problem2(input: Vec<String>) -> u64 {
+    let mut it = input.iter();
+
+    let mut current: Vec<u64> = it
+        .next()
+        .unwrap()
+        .split_whitespace()
+        .filter_map(|s| s.parse().ok())
+        .collect::<Vec<_>>()
+        .chunks(2)
+        .map(|c| (c[0]..c[0] + c[1]).collect::<Vec<_>>())
+        .flatten()
+        .collect();
+
+    solve(&mut it, &mut current)
+}
+
+#[test]
+fn day05_problem2_test() {
+    assert_eq!(
+        day05_problem2(crate::lines_from_file("inputs/05-example.txt")),
+        46,
+    );
+}
+
+#[test]
+fn day05_problem2_solution() {
+    panic!("WARNING: This test takes A LOT of time to run. If you really want to run it, remove this line.");
+    let solution = day05_problem2(crate::lines_from_file("inputs/05.txt"));
+    println!("Solution for day 05 problem 2: {}", solution);
 }
