@@ -51,11 +51,11 @@ pub fn day04_problem1(input: Vec<String>) -> u32 {
     input
         .into_iter()
         .map(|s| {
-            let s = s.split(":").nth(1).unwrap();
+            let s = s.split(':').nth(1).unwrap();
             let v = s
-                .split("|")
+                .split('|')
                 .map(|s| {
-                    s.split(" ")
+                    s.split(' ')
                         .filter_map(|s| s.trim().parse::<u32>().ok())
                         .collect::<std::collections::HashSet<u32>>()
                 })
@@ -130,11 +130,11 @@ fn day04_problem1_solution() {
 pub fn day04_problem2(input: Vec<String>) -> u32 {
     let mut counter = vec![1; input.len()];
     input.into_iter().enumerate().for_each(|(idx, s)| {
-        let s = s.split(":").nth(1).unwrap();
+        let s = s.split(':').nth(1).unwrap();
         let v = s
-            .split("|")
+            .split('|')
             .map(|s| {
-                s.split(" ")
+                s.split(' ')
                     .filter_map(|s| s.trim().parse::<u32>().ok())
                     .collect::<std::collections::HashSet<u32>>()
             })
@@ -142,7 +142,9 @@ pub fn day04_problem2(input: Vec<String>) -> u32 {
         let r = v[0].intersection(&v[1]).count();
         let amt = counter[idx];
         for i in (idx + 1)..=(idx + r) {
-            counter.get_mut(i).map(|c| *c += amt);
+            if let Some(c) = counter.get_mut(i) {
+                *c += amt;
+            }
         }
     });
     counter.into_iter().sum()

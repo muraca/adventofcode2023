@@ -179,7 +179,7 @@ fn solve(it: &mut std::slice::Iter<String>, current: &mut Vec<u64>) -> u64 {
         });
     }
 
-    *current.into_iter().min().unwrap()
+    *current.iter().min().unwrap()
 }
 
 /// Everyone will starve if you only plant such a small number of seeds.
@@ -210,8 +210,7 @@ pub fn day05_problem2(input: Vec<String>) -> u64 {
         .filter_map(|s| s.parse().ok())
         .collect::<Vec<_>>()
         .chunks(2)
-        .map(|c| (c[0]..c[0] + c[1]).collect::<Vec<_>>())
-        .flatten()
+        .flat_map(|c| (c[0]..c[0] + c[1]).collect::<Vec<_>>())
         .collect();
 
     solve(&mut it, &mut current)
@@ -227,7 +226,7 @@ fn day05_problem2_test() {
 
 #[test]
 fn day05_problem2_solution() {
-    panic!("WARNING: This test takes A LOT of time to run. If you really want to run it, remove this line.");
-    let solution = day05_problem2(crate::lines_from_file("inputs/05.txt"));
-    println!("Solution for day 05 problem 2: {}", solution);
+    panic!("WARNING: This test takes A LOT of time to run.");
+    // let solution = day05_problem2(crate::lines_from_file("inputs/05.txt"));
+    // println!("Solution for day 05 problem 2: {}", solution);
 }
