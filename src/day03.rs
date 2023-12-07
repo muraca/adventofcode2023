@@ -39,7 +39,7 @@
 ///
 /// Of course, the actual engine schematic is much larger.
 /// What is the sum of all of the part numbers in the engine schematic?
-pub fn day03_problem1(mut input: Vec<String>) -> u32 {
+pub fn problem1(mut input: Vec<String>) -> u32 {
     input.iter_mut().for_each(|line| line.push('.')); // blink blink we avoid the edge case where the number is at the end of the line
     input
         .iter()
@@ -73,29 +73,6 @@ pub fn day03_problem1(mut input: Vec<String>) -> u32 {
                 .2
         })
         .sum()
-}
-
-#[test]
-fn day03_problem1_test() {
-    let input = vec![
-        "467..114..".to_string(),
-        "...*......".to_string(),
-        "..35..633.".to_string(),
-        "......#...".to_string(),
-        "617*......".to_string(),
-        ".....+.58.".to_string(),
-        "..592.....".to_string(),
-        "......755.".to_string(),
-        "...$.*....".to_string(),
-        ".664.598..".to_string(),
-    ];
-    assert_eq!(day03_problem1(input), 4361);
-}
-
-#[test]
-fn day03_problem1_solution() {
-    let solution = day03_problem1(crate::lines_from_file("inputs/03.txt"));
-    println!("Solution for day 03 problem 1: {}", solution);
 }
 
 /// The engineer finds the missing part and installs it in the engine!
@@ -135,7 +112,7 @@ fn day03_problem1_solution() {
 /// Adding up all of the gear ratios produces 467835.
 ///
 /// What is the sum of all of the gear ratios in your engine schematic?
-pub fn day03_problem2(input: Vec<String>) -> u32 {
+pub fn problem2(input: Vec<String>) -> u32 {
     input
         .iter()
         .enumerate()
@@ -201,25 +178,36 @@ fn get_num(ch: &Vec<char>, at: usize) -> Vec<u32> {
     vec![res]
 }
 
-#[test]
-fn day03_problem2_test() {
-    let input = vec![
-        "467..114..".to_string(),
-        "...*......".to_string(),
-        "..35..633.".to_string(),
-        "......#...".to_string(),
-        "617*......".to_string(),
-        ".....+.58.".to_string(),
-        "..592.....".to_string(),
-        "......755.".to_string(),
-        "...$.*....".to_string(),
-        ".664.598..".to_string(),
-    ];
-    assert_eq!(day03_problem2(input), 467835);
+#[cfg(test)]
+mod test {
+    #[test]
+    fn problem1() {
+        assert_eq!(
+            super::problem1(crate::lines_from_file("inputs/03-example.txt")),
+            4361
+        );
+    }
+
+    #[test]
+    fn problem2() {
+        assert_eq!(
+            super::problem2(crate::lines_from_file("inputs/03-example.txt")),
+            467835
+        );
+    }
 }
 
-#[test]
-fn day03_problem2_solution() {
-    let solution = day03_problem2(crate::lines_from_file("inputs/03.txt"));
-    println!("Solution for day 03 problem 2: {}", solution);
+#[cfg(test)]
+mod solution {
+    #[test]
+    fn problem1() {
+        let solution = super::problem1(crate::lines_from_file("inputs/03.txt"));
+        println!("Solution for day 03 problem 1: {}", solution);
+    }
+
+    #[test]
+    fn problem2() {
+        let solution = super::problem2(crate::lines_from_file("inputs/03.txt"));
+        println!("Solution for day 03 problem 2: {}", solution);
+    }
 }

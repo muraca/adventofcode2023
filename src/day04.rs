@@ -47,7 +47,7 @@
 /// So, in this example, the Elf's pile of scratchcards is worth 13 points.
 ///
 /// Take a seat in the large pile of colorful cards. How many points are they worth in total?
-pub fn day04_problem1(input: Vec<String>) -> u32 {
+pub fn problem1(input: Vec<String>) -> u32 {
     input
         .into_iter()
         .map(|s| {
@@ -66,25 +66,6 @@ pub fn day04_problem1(input: Vec<String>) -> u32 {
             }
         })
         .sum()
-}
-
-#[test]
-fn day04_problem1_test() {
-    let input = vec![
-        "Card 1: 41 48 83 86 17 | 83 86  6 31 17  9 48 53".to_string(),
-        "Card 2: 13 32 20 16 61 | 61 30 68 82 17 32 24 19".to_string(),
-        "Card 3:  1 21 53 59 44 | 69 82 63 72 16 21 14  1".to_string(),
-        "Card 4: 41 92 73 84 69 | 59 84 76 51 58  5 54 83".to_string(),
-        "Card 5: 87 83 26 28 32 | 88 30 70 12 93 22 82 36".to_string(),
-        "Card 6: 31 18 13 56 72 | 74 77 10 23 35 67 36 11".to_string(),
-    ];
-    assert_eq!(day04_problem1(input), 13);
-}
-
-#[test]
-fn day04_problem1_solution() {
-    let solution = day04_problem1(crate::lines_from_file("inputs/04.txt"));
-    println!("Solution for day 04 problem 1: {}", solution);
 }
 
 /// Just as you're about to report your findings to the Elf, one of you realizes that the rules have actually
@@ -127,7 +108,7 @@ fn day04_problem1_solution() {
 ///
 /// Process all of the original and copied scratchcards until no more scratchcards are won.
 /// Including the original set of scratchcards, how many total scratchcards do you end up with?
-pub fn day04_problem2(input: Vec<String>) -> u32 {
+pub fn problem2(input: Vec<String>) -> u32 {
     let mut counter = vec![1; input.len()];
     input.into_iter().enumerate().for_each(|(idx, s)| {
         let s = s.split(':').nth(1).unwrap();
@@ -150,21 +131,36 @@ pub fn day04_problem2(input: Vec<String>) -> u32 {
     counter.into_iter().sum()
 }
 
-#[test]
-fn day04_problem2_test() {
-    let input = vec![
-        "Card 1: 41 48 83 86 17 | 83 86  6 31 17  9 48 53".to_string(),
-        "Card 2: 13 32 20 16 61 | 61 30 68 82 17 32 24 19".to_string(),
-        "Card 3:  1 21 53 59 44 | 69 82 63 72 16 21 14  1".to_string(),
-        "Card 4: 41 92 73 84 69 | 59 84 76 51 58  5 54 83".to_string(),
-        "Card 5: 87 83 26 28 32 | 88 30 70 12 93 22 82 36".to_string(),
-        "Card 6: 31 18 13 56 72 | 74 77 10 23 35 67 36 11".to_string(),
-    ];
-    assert_eq!(day04_problem2(input), 30);
+#[cfg(test)]
+mod test {
+    #[test]
+    fn problem1() {
+        assert_eq!(
+            super::problem1(crate::lines_from_file("inputs/04-example.txt")),
+            13
+        );
+    }
+
+    #[test]
+    fn problem2() {
+        assert_eq!(
+            super::problem2(crate::lines_from_file("inputs/04-example.txt")),
+            30
+        );
+    }
 }
 
-#[test]
-fn day04_problem2_solution() {
-    let solution = day04_problem2(crate::lines_from_file("inputs/04.txt"));
-    println!("Solution for day 04 problem 2: {}", solution);
+#[cfg(test)]
+mod solution {
+    #[test]
+    fn problem1() {
+        let solution = super::problem1(crate::lines_from_file("inputs/04.txt"));
+        println!("Solution for day 04 problem 1: {}", solution);
+    }
+
+    #[test]
+    fn problem2() {
+        let solution = super::problem2(crate::lines_from_file("inputs/04.txt"));
+        println!("Solution for day 04 problem 2: {}", solution);
+    }
 }

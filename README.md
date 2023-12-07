@@ -10,12 +10,13 @@ To test all the problems I have solved so far against the examples provided by t
 cargo test test
 ```
 
-If you want to run a specific problem, run:
+If you want to test a specific problem, run:
 ```bash
-cargo test day01_problem01
+cargo test day01::test::problem1
 ```
 
 Or if you want to retrieve the solution for a specific problem, run:
 ```bash
-cargo test day01_problem01_solution -- --nocapture
+cargo test day01::solution::problem2 -- --nocapture
 ```
+Be aware that some of these solutions may intentionally fail, as they take a lot of time to run, so I intentionally put a panic to avoid running them by mistake.

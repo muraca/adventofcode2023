@@ -43,7 +43,7 @@
 ///
 /// Determine which games would have been possible if the bag had been loaded with only 12 red cubes,
 /// 13 green cubes, and 14 blue cubes. What is the sum of the IDs of those games?
-pub fn day02_problem1(games: Vec<String>) -> u32 {
+pub fn problem1(games: Vec<String>) -> u32 {
     games
         .iter()
         .map(|s| Game::from(s.as_str()))
@@ -96,24 +96,6 @@ impl From<&str> for Game {
     }
 }
 
-#[test]
-fn day02_problem1_test() {
-    let games = vec![
-        "Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green".to_string(),
-        "Game 2: 1 blue, 2 green; 3 green, 4 blue, 1 red; 1 green, 1 blue".to_string(),
-        "Game 3: 8 green, 6 blue, 20 red; 5 blue, 4 red, 13 green; 5 green, 1 red".to_string(),
-        "Game 4: 1 green, 3 red, 6 blue; 3 green, 6 red; 3 green, 15 blue, 14 red".to_string(),
-        "Game 5: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green".to_string(),
-    ];
-    assert_eq!(day02_problem1(games), 8);
-}
-
-#[test]
-fn day02_problem1_solution() {
-    let solution = day02_problem1(crate::lines_from_file("inputs/02.txt"));
-    println!("Solution for day 02 problem 1: {}", solution);
-}
-
 /// The Elf says they've stopped producing snow because they aren't getting any water!
 /// He isn't sure why the water stopped; however, he can show you how to get to the water source
 /// to check it out for yourself. It's just up ahead!
@@ -140,7 +122,7 @@ fn day02_problem1_solution() {
 /// Adding up these five powers produces the sum 2286.
 ///
 /// For each game, find the minimum set of cubes that must have been present. What is the sum of the power of these sets?
-pub fn day02_problem2(games: Vec<String>) -> u32 {
+pub fn problem2(games: Vec<String>) -> u32 {
     games
         .iter()
         .map(|s| {
@@ -158,20 +140,36 @@ pub fn day02_problem2(games: Vec<String>) -> u32 {
         .sum()
 }
 
-#[test]
-fn day02_problem2_test() {
-    let games = vec![
-        "Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green".to_string(),
-        "Game 2: 1 blue, 2 green; 3 green, 4 blue, 1 red; 1 green, 1 blue".to_string(),
-        "Game 3: 8 green, 6 blue, 20 red; 5 blue, 4 red, 13 green; 5 green, 1 red".to_string(),
-        "Game 4: 1 green, 3 red, 6 blue; 3 green, 6 red; 3 green, 15 blue, 14 red".to_string(),
-        "Game 5: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green".to_string(),
-    ];
-    assert_eq!(day02_problem2(games), 2286);
+#[cfg(test)]
+mod test {
+    #[test]
+    fn problem1() {
+        assert_eq!(
+            super::problem1(crate::lines_from_file("inputs/02-example.txt")),
+            8
+        );
+    }
+
+    #[test]
+    fn problem2() {
+        assert_eq!(
+            super::problem2(crate::lines_from_file("inputs/02-example.txt")),
+            2286
+        );
+    }
 }
 
-#[test]
-fn day02_problem2_solution() {
-    let solution = day02_problem2(crate::lines_from_file("inputs/02.txt"));
-    println!("Solution for day 02 problem 2: {}", solution);
+#[cfg(test)]
+mod solution {
+    #[test]
+    fn problem1() {
+        let solution = super::problem1(crate::lines_from_file("inputs/02.txt"));
+        println!("Solution for day 02 problem 1: {}", solution);
+    }
+
+    #[test]
+    fn problem2() {
+        let solution = super::problem2(crate::lines_from_file("inputs/02.txt"));
+        println!("Solution for day 02 problem 2: {}", solution);
+    }
 }

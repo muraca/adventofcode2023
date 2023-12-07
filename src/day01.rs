@@ -38,7 +38,7 @@
 /// Adding these together produces 142.
 ///
 /// Consider your entire calibration document. What is the sum of all of the calibration values?
-pub fn day01_problem1(input: Vec<String>) -> u32 {
+pub fn problem1(input: Vec<String>) -> u32 {
     input
         .iter()
         .map(|line| {
@@ -48,23 +48,6 @@ pub fn day01_problem1(input: Vec<String>) -> u32 {
             first * 10 + last
         })
         .sum()
-}
-
-#[test]
-fn day01_problem1_test() {
-    let input: Vec<String> = vec![
-        "1abc2".to_string(),
-        "pqr3stu8vwx".to_string(),
-        "a1b2c3d4e5f".to_string(),
-        "treb7uchet".to_string(),
-    ];
-    assert_eq!(day01_problem1(input), 142);
-}
-
-#[test]
-fn day01_problem1_solution() {
-    let solution = day01_problem1(crate::lines_from_file("inputs/01.txt"));
-    println!("Solution for day 01 problem 1: {}", solution);
 }
 
 /// Your calculation isn't quite right. It looks like some of the digits are actually spelled out with
@@ -83,7 +66,7 @@ fn day01_problem1_solution() {
 /// ---
 /// In this example, the calibration values are 29, 83, 13, 24, 42, 14, and 76.
 /// Adding these together produces 281.
-pub fn day01_problem2(input: Vec<String>) -> u32 {
+pub fn problem2(input: Vec<String>) -> u32 {
     input
         .iter()
         .map(|line| {
@@ -114,22 +97,36 @@ fn do_match(input: &str) -> Option<u32> {
     None
 }
 
-#[test]
-fn day01_problem2_test() {
-    let input: Vec<String> = vec![
-        "two1nine".to_string(),
-        "eightwothree".to_string(),
-        "abcone2threexyz".to_string(),
-        "xtwone3four".to_string(),
-        "4nineeightseven2".to_string(),
-        "zoneight234".to_string(),
-        "7pqrstsixteen".to_string(),
-    ];
-    assert_eq!(day01_problem2(input), 281);
+#[cfg(test)]
+mod test {
+    #[test]
+    fn problem1() {
+        assert_eq!(
+            super::problem1(crate::lines_from_file("inputs/01-example1.txt")),
+            142
+        );
+    }
+
+    #[test]
+    fn problem2() {
+        assert_eq!(
+            super::problem2(crate::lines_from_file("inputs/01-example2.txt")),
+            281
+        );
+    }
 }
 
-#[test]
-fn day01_problem2_solution() {
-    let solution = day01_problem2(crate::lines_from_file("inputs/01.txt"));
-    println!("Solution for day 01 problem 2: {}", solution);
+#[cfg(test)]
+mod solution {
+    #[test]
+    fn problem1() {
+        let solution = super::problem1(crate::lines_from_file("inputs/01.txt"));
+        println!("Solution for day 01 problem 1: {}", solution);
+    }
+
+    #[test]
+    fn problem2() {
+        let solution = super::problem2(crate::lines_from_file("inputs/01.txt"));
+        println!("Solution for day 01 problem 2: {}", solution);
+    }
 }

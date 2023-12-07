@@ -1,4 +1,4 @@
-/// If You Give A Seed A Fertilizer
+/// Day 5: If You Give A Seed A Fertilizer
 ///
 /// You take the boat and find the gardener right where you were told he would be:
 /// managing a giant "garden" that looks more to you like a farm.
@@ -124,7 +124,7 @@
 /// So, the lowest location number in this example is 35.
 ///
 /// What is the lowest location number that corresponds to any of the initial seed numbers?
-pub fn day05_problem1(input: Vec<String>) -> u64 {
+pub fn problem1(input: Vec<String>) -> u64 {
     let mut it = input.iter();
 
     let mut current: Vec<u64> = it
@@ -135,20 +135,6 @@ pub fn day05_problem1(input: Vec<String>) -> u64 {
         .collect();
 
     solve(&mut it, &mut current)
-}
-
-#[test]
-fn day05_problem1_test() {
-    assert_eq!(
-        day05_problem1(crate::lines_from_file("inputs/05-example.txt")),
-        35,
-    );
-}
-
-#[test]
-fn day05_problem1_solution() {
-    let solution = day05_problem1(crate::lines_from_file("inputs/05.txt"));
-    println!("Solution for day 05 problem 1: {}", solution);
 }
 
 fn solve(it: &mut std::slice::Iter<String>, current: &mut Vec<u64>) -> u64 {
@@ -200,7 +186,7 @@ fn solve(it: &mut std::slice::Iter<String>, current: &mut Vec<u64>) -> u64 {
 ///
 /// Consider all of the initial seed numbers listed in the ranges on the first line of the almanac.
 /// What is the lowest location number that corresponds to any of the initial seed numbers?
-pub fn day05_problem2(input: Vec<String>) -> u64 {
+pub fn problem2(input: Vec<String>) -> u64 {
     let mut it = input.iter();
 
     let mut current: Vec<u64> = it
@@ -216,17 +202,37 @@ pub fn day05_problem2(input: Vec<String>) -> u64 {
     solve(&mut it, &mut current)
 }
 
-#[test]
-fn day05_problem2_test() {
-    assert_eq!(
-        day05_problem2(crate::lines_from_file("inputs/05-example.txt")),
-        46,
-    );
+#[cfg(test)]
+mod test {
+    #[test]
+    fn problem1() {
+        assert_eq!(
+            super::problem1(crate::lines_from_file("inputs/05-example.txt")),
+            35,
+        );
+    }
+
+    #[test]
+    fn problem2() {
+        assert_eq!(
+            super::problem2(crate::lines_from_file("inputs/05-example.txt")),
+            46,
+        );
+    }
 }
 
-#[test]
-fn day05_problem2_solution() {
-    panic!("WARNING: This test takes A LOT of time to run.");
-    // let solution = day05_problem2(crate::lines_from_file("inputs/05.txt"));
-    // println!("Solution for day 05 problem 2: {}", solution);
+#[cfg(test)]
+mod solution {
+    #[test]
+    fn problem1() {
+        let solution = super::problem1(crate::lines_from_file("inputs/05.txt"));
+        println!("Solution for day 05 problem 1: {}", solution);
+    }
+
+    #[test]
+    fn problem2() {
+        panic!("WARNING: This test takes A LOT of time to run.");
+        // let solution = super::problem2(crate::lines_from_file("inputs/05.txt"));
+        // println!("Solution for day 05 problem 2: {}", solution);
+    }
 }

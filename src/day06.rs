@@ -1,4 +1,4 @@
-/// Wait For It
+/// Day 6: Wait For It
 ///
 /// The ferry quickly brings you across Island Island. After asking around, you discover that
 /// there is indeed normally a large pile of sand somewhere near here, but you don't see anything
@@ -67,7 +67,7 @@
 /// in this example, if you multiply these values together, you get 288 (4 * 8 * 9).
 ///
 /// Determine the number of ways you could beat the record in each race. What do you get if you multiply these numbers together?
-pub fn day06_problem1(input: [&str; 2]) -> u64 {
+pub fn problem1(input: Vec<String>) -> u64 {
     let times: Vec<u64> = input[0]
         .split_whitespace()
         .filter_map(|s| s.parse().ok())
@@ -99,7 +99,7 @@ pub fn day06_problem1(input: [&str; 2]) -> u64 {
 /// You could hold the button anywhere from 14 to 71516 milliseconds and beat the record, a total of 71503 ways!
 ///
 /// How many ways can you beat the record in this one much longer race?
-pub fn day06_problem2(input: [&str; 2]) -> u64 {
+pub fn problem2(input: Vec<String>) -> u64 {
     let parse: Vec<u64> = input
         .iter()
         .filter_map(|s| {
@@ -125,32 +125,35 @@ fn solve(t: u64, d: u64) -> u64 {
 }
 
 #[cfg(test)]
-const TEST_INPUT: [&str; 2] = ["Time:      7  15   30", "Distance:  9  40  200"];
+mod test {
+    #[test]
+    fn problem1() {
+        assert_eq!(
+            super::problem1(crate::lines_from_file("inputs/06-example.txt")),
+            288
+        );
+    }
+
+    #[test]
+    fn problem2() {
+        assert_eq!(
+            super::problem2(crate::lines_from_file("inputs/06-example.txt")),
+            71503
+        );
+    }
+}
 
 #[cfg(test)]
-const PROBLEM_INPUT: [&str; 2] = [
-    "Time:        38     67     76     73",
-    "Distance:   234   1027   1157   1236",
-];
+mod solution {
+    #[test]
+    fn problem1() {
+        let solution = super::problem1(crate::lines_from_file("inputs/06.txt"));
+        println!("Solution for day 06 problem 1: {}", solution);
+    }
 
-#[test]
-fn day06_problem1_test() {
-    assert_eq!(day06_problem1(TEST_INPUT), 288);
-}
-
-#[test]
-fn day06_problem1_solution() {
-    let solution = day06_problem1(PROBLEM_INPUT);
-    println!("Solution for day 06 problem 1: {}", solution);
-}
-
-#[test]
-fn day06_problem2_test() {
-    assert_eq!(day06_problem2(TEST_INPUT), 71503);
-}
-
-#[test]
-fn day06_problem2_solution() {
-    let solution = day06_problem2(PROBLEM_INPUT);
-    println!("Solution for day 06 problem 2: {}", solution);
+    #[test]
+    fn problem2() {
+        let solution = super::problem2(crate::lines_from_file("inputs/06.txt"));
+        println!("Solution for day 06 problem 2: {}", solution);
+    }
 }
