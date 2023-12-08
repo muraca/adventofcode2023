@@ -75,17 +75,61 @@
 ///
 /// Find the rank of every hand in your set. What are the total winnings?
 pub fn problem1(input: Vec<String>) -> u32 {
+    solve(input, false)
+}
+
+/// To make things a little more interesting, the Elf introduces one additional rule.
+/// Now, J cards are jokers - wildcards that can act like whatever card would make the hand the strongest type possible.
+///
+/// To balance this, J cards are now the weakest individual cards, weaker even than 2.
+/// The other cards stay in the same order: A, K, Q, T, 9, 8, 7, 6, 5, 4, 3, 2, J.
+///
+/// J cards can pretend to be whatever card is best for the purpose of determining hand type; for example, QJJQ2 is now
+/// considered four of a kind. However, for the purpose of breaking ties between two hands of the same type,
+/// J is always treated as J, not the card it's pretending to be: JKKK2 is weaker than QQQQ2 because J is weaker than Q.
+///
+/// Now, the above example goes very differently:
+/// ```
+/// 32T3K 765
+/// T55J5 684
+/// KK677 28
+/// KTJJT 220
+/// QQQJA 483
+/// ```
+/// - 32T3K is still the only one pair; it doesn't contain any jokers, so its strength doesn't increase.
+/// - KK677 is now the only two pair, making it the second-weakest hand.
+/// - T55J5, KTJJT, and QQQJA are now all four of a kind! T55J5 gets rank 3, QQQJA gets rank 4, and KTJJT gets rank 5.
+///
+/// With the new joker rule, the total winnings in this example are 5905.
+///
+/// Using the new joker rule, find the rank of every hand in your set. What are the new total winnings?
+pub fn problem2(input: Vec<String>) -> u32 {
+    solve(input, true)
+}
+
+fn solve(input: Vec<String>, joker: bool) -> u32 {
     let mut values: Vec<Hand> = input
         .iter()
         .filter_map(|s| {
             let mut it = s.split_whitespace();
-            let cards = it.next()?.chars().map(|c| val(c)).collect();
+            let cards: Vec<u32> = it.next()?.chars().map(|c| val(c, joker)).collect();
             let rank = rank(&cards);
             let bid = it.next()?.parse().ok()?;
             Some(Hand { cards, rank, bid })
         })
         .collect();
-    values.sort_by(|a, b| a.cmp(b));
+    values.sort_by(|a, b| match a.rank.cmp(&b.rank) {
+        std::cmp::Ordering::Equal => a
+            .cards
+            .iter()
+            .zip(b.cards.iter())
+            .find_map(|(a, b)| match a.cmp(b) {
+                std::cmp::Ordering::Equal => None,
+                x => Some(x),
+            })
+            .unwrap_or(std::cmp::Ordering::Equal),
+        x => x,
+    });
     values
         .iter()
         .enumerate()
@@ -93,33 +137,18 @@ pub fn problem1(input: Vec<String>) -> u32 {
         .sum()
 }
 
-#[derive(PartialEq, Eq, PartialOrd)]
 struct Hand {
     cards: Vec<u32>,
     rank: u32,
     bid: u32,
 }
 
-impl Ord for Hand {
-    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
-        match self.rank.cmp(&other.rank) {
-            std::cmp::Ordering::Equal => self
-                .cards
-                .iter()
-                .zip(other.cards.iter())
-                .find_map(|(a, b)| match a.cmp(b) {
-                    std::cmp::Ordering::Equal => None,
-                    x => Some(x),
-                })
-                .unwrap_or(std::cmp::Ordering::Equal),
-            x => x,
-        }
-    }
-}
+fn rank(cards: &[u32]) -> u32 {
+    let jokers = cards.iter().filter(|x| **x == 0).count() as u32;
 
-fn rank(cards: &Vec<u32>) -> u32 {
-    let counts: Vec<u32> = cards
+    let mut counts: Vec<u32> = cards
         .iter()
+        .filter(|x| **x != 0)
         .fold(vec![], |mut acc, val| {
             match acc.iter().position(|x: &(u32, u32)| x.0 == *val) {
                 Some(i) => acc[i].1 += 1,
@@ -131,27 +160,34 @@ fn rank(cards: &Vec<u32>) -> u32 {
         .map(|x| x.1)
         .collect();
 
-    match counts.iter().max().cloned().unwrap_or(0) {
-        5 => 6,
-        4 => 5,
-        3 => match counts.iter().filter(|x| **x == 2).count() {
-            1 => 4,
-            _ => 3,
-        },
-        2 => match counts.iter().filter(|x| **x == 2).count() {
-            2 => 2,
-            _ => 1,
-        },
-        _ => 0,
+    counts.sort();
+
+    let mut it = counts.into_iter().rev();
+    let m1 = it.next().unwrap_or_default();
+    let m2 = it.next().unwrap_or_default();
+    if m1 + jokers >= 5 {
+        6
+    } else if m1 + jokers == 4 {
+        5
+    } else if m1 + m2 + jokers >= 5 {
+        4
+    } else if m1 + jokers == 3 {
+        3
+    } else if m1 + m2 + jokers == 4 {
+        2
+    } else if m1 + jokers == 2 {
+        1
+    } else {
+        0
     }
 }
 
-fn val(c: char) -> u32 {
+fn val(c: char, joker: bool) -> u32 {
     match c {
         'A' => 14,
         'K' => 13,
         'Q' => 12,
-        'J' => 11,
+        'J' => !joker as u32 * 11,
         'T' => 10,
         '2'..='9' => c.to_digit(10).unwrap(),
         _ => panic!("Invalid card value"),
@@ -167,6 +203,14 @@ mod test {
             6440
         );
     }
+
+    #[test]
+    fn problem2() {
+        assert_eq!(
+            super::problem2(crate::lines_from_file("inputs/07-example.txt")),
+            5905
+        );
+    }
 }
 
 #[cfg(test)]
@@ -175,5 +219,11 @@ mod solution {
     fn problem1() {
         let solution = super::problem1(crate::lines_from_file("inputs/07.txt"));
         println!("Solution for day 07 problem 1: {}", solution);
+    }
+
+    #[test]
+    fn problem2() {
+        let solution = super::problem2(crate::lines_from_file("inputs/07.txt"));
+        println!("Solution for day 07 problem 2: {}", solution);
     }
 }
