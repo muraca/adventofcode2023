@@ -1,4 +1,5 @@
 /// Day 9: Mirage Maintenance
+///
 /// You ride the camel through the sandstorm and stop where the ghost's maps told you to stop.
 /// The sandstorm subsequently subsides, somehow seeing you standing at an oasis!
 ///
@@ -54,7 +55,8 @@
 ///   3   3   3   3   3   3
 ///     0   0   0   0   0
 /// ```
-/// Finally, you can fill in B, which needs to be the result of increasing 15 (the value to its left) by 3 (the value below it), or 18:
+/// Finally, you can fill in B, which needs to be the result of increasing 15 (the value to its left)
+/// by 3 (the value below it), or 18:
 /// ```
 /// 0   3   6   9  12  15  18
 ///   3   3   3   3   3   3
@@ -90,7 +92,8 @@
 ///
 /// If you find the next value for each history in this example and add them together, you get 114.
 ///
-/// Analyze your OASIS report and extrapolate the next value for each history. What is the sum of these extrapolated values?
+/// Analyze your OASIS report and extrapolate the next value for each history.
+/// What is the sum of these extrapolated values?
 pub fn problem1(input: Vec<String>) -> isize {
     input
         .iter()
@@ -114,6 +117,36 @@ fn next_value(current: Vec<isize>) -> isize {
         }
 }
 
+/// Of course, it would be nice to have even more history included in your report.
+/// Surely it's safe to just extrapolate backwards as well, right?
+///
+/// For each history, repeat the process of finding differences until the sequence of differences
+/// is entirely zero. Then, rather than adding a zero to the end and filling in the next values
+/// of each previous sequence, you should instead add a zero to the beginning of your sequence of zeroes,
+/// then fill in new first values for each previous sequence.
+///
+/// In particular, here is what the third example history looks like when extrapolating back in time:
+/// ```
+/// 5  10  13  16  21  30  45
+///   5   3   3   5   9  15
+///    -2   0   2   4   6
+///       2   2   2   2
+///         0   0   0
+/// Adding the new values on the left side of each sequence from bottom to top
+/// eventually reveals the new left-most history value: 5.
+///
+/// Doing this for the remaining example data above results in previous values of -3
+/// for the first history and 0 for the second history. Adding all three new values together produces 2.
+///
+/// Analyze your OASIS report again, this time extrapolating the previous value for each history.
+/// What is the sum of these extrapolated values?
+pub fn problem2(input: Vec<String>) -> isize {
+    input
+        .iter()
+        .map(|l| next_value(l.split(' ').filter_map(|c| c.parse().ok()).rev().collect()))
+        .sum()
+}
+
 #[cfg(test)]
 mod test {
     #[test]
@@ -121,6 +154,14 @@ mod test {
         assert_eq!(
             super::problem1(crate::lines_from_file("inputs/09-example.txt")),
             114
+        );
+    }
+
+    #[test]
+    fn problem2() {
+        assert_eq!(
+            super::problem2(crate::lines_from_file("inputs/09-example.txt")),
+            2
         );
     }
 }
@@ -131,5 +172,11 @@ mod solution {
     fn problem1() {
         let solution = super::problem1(crate::lines_from_file("inputs/09.txt"));
         println!("Solution for day 09 problem 1: {}", solution);
+    }
+
+    #[test]
+    fn problem2() {
+        let solution = super::problem2(crate::lines_from_file("inputs/09.txt"));
+        println!("Solution for day 09 problem 2: {}", solution);
     }
 }
