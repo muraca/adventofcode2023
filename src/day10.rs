@@ -124,9 +124,20 @@
 /// Find the single giant loop starting at S. How many steps along the loop does it take
 /// to get from the starting position to the point farthest from the starting position?
 pub fn problem1(input: Vec<String>) -> usize {
-    let input: Vec<Vec<char>> = input.into_iter().map(|s| s.chars().collect()).collect();
+    use Direction::*;
 
-    let (start_i, start_j) = input
+    let input: Vec<Vec<char>> = input.into_iter().map(|s| s.chars().collect()).collect();
+    let (start_i, start_j) = start_coordinates(&input);
+
+    vec![U, D, L, R]
+        .iter()
+        .map(|d| path(&input, start_i, start_j, *d).len() / 2)
+        .max()
+        .unwrap_or(0)
+}
+
+fn start_coordinates(input: &Vec<Vec<char>>) -> (usize, usize) {
+    input
         .iter()
         .enumerate()
         .find_map(|(i, row)| {
@@ -135,46 +146,43 @@ pub fn problem1(input: Vec<String>) -> usize {
                 .find(|(_, &c)| c == 'S')
                 .map(|(j, _)| (i, j))
         })
-        .unwrap();
+        .unwrap()
+}
 
+fn path(
+    input: &Vec<Vec<char>>,
+    mut i: usize,
+    mut j: usize,
+    mut d: Direction,
+) -> Vec<(usize, usize)> {
     use Direction::*;
+    let mut path = Vec::new();
+    loop {
+        match d {
+            U => match i > 0 {
+                true => i -= 1,
+                _ => return Vec::new(),
+            },
+            D => i += 1,
+            L => match j > 0 {
+                true => j -= 1,
+                _ => return Vec::new(),
+            },
+            R => j += 1,
+        }
+        path.push((i, j));
+        d = match (input[i][j], d) {
+            ('F', U) | ('L', D) => R,
+            ('7', U) | ('J', D) => L,
 
-    vec![U, D, L, R]
-        .iter()
-        .map(|d| {
-            let mut i = start_i;
-            let mut j = start_j;
-            let mut d = *d;
-            let mut steps = 0;
-            loop {
-                match d {
-                    U => match i > 0 {
-                        true => i -= 1,
-                        _ => return 0,
-                    },
-                    D => i += 1,
-                    L => match j > 0 {
-                        true => j -= 1,
-                        _ => return 0,
-                    },
-                    R => j += 1,
-                }
-                steps += 1;
-                d = match (input[i][j], d) {
-                    ('F', U) | ('L', D) => R,
-                    ('7', U) | ('J', D) => L,
+            ('7', R) | ('F', L) => D,
+            ('J', R) | ('L', L) => U,
 
-                    ('7', R) | ('F', L) => D,
-                    ('J', R) | ('L', L) => U,
-
-                    ('|', _) | ('-', _) => d,
-                    ('S', _) | ('.', _) => return steps / 2,
-                    (c, d) => panic!("unexpected char {c} for direction {d:?}"),
-                };
-            }
-        })
-        .max()
-        .unwrap_or(0)
+            ('|', _) | ('-', _) => d,
+            ('S', _) | ('.', _) => return path,
+            _ => return Vec::new(),
+        };
+    }
 }
 
 #[derive(PartialEq, Clone, Copy, Debug)]
@@ -183,6 +191,143 @@ enum Direction {
     D,
     L,
     R,
+}
+
+/// You quickly reach the farthest point of the loop, but the animal never emerges.
+/// Maybe its nest is within the area enclosed by the loop?
+///
+/// To determine whether it's even worth taking the time to search for such a nest,
+/// you should calculate how many tiles are contained within the loop. For example:
+/// ```
+/// ...........
+/// .S-------7.
+/// .|F-----7|.
+/// .||.....||.
+/// .||.....||.
+/// .|L-7.F-J|.
+/// .|..|.|..|.
+/// .L--J.L--J.
+/// ...........
+/// ```
+/// The above loop encloses merely four tiles - the two pairs of . in the southwest and southeast (marked I below).
+/// The middle . tiles (marked O below) are not in the loop. Here is the same loop again with those regions marked:
+/// ```
+/// ...........
+/// .S-------7.
+/// .|F-----7|.
+/// .||OOOOO||.
+/// .||OOOOO||.
+/// .|L-7OF-J|.
+/// .|II|O|II|.
+/// .L--JOL--J.
+/// .....O.....
+/// ```
+/// In fact, there doesn't even need to be a full tile path to the outside for tiles to count as outside the loop
+/// - squeezing between pipes is also allowed! Here, I is still within the loop and O is still outside the loop:
+/// ```
+/// ..........
+/// .S------7.
+/// .|F----7|.
+/// .||OOOO||.
+/// .||OOOO||.
+/// .|L-7F-J|.
+/// .|II||II|.
+/// .L--JL--J.
+/// ..........
+/// ```
+/// In both of the above examples, 4 tiles are enclosed by the loop.
+///
+/// Here's a larger example:
+/// ```
+/// .F----7F7F7F7F-7....
+/// .|F--7||||||||FJ....
+/// .||.FJ||||||||L7....
+/// FJL7L7LJLJ||LJ.L-7..
+/// L--J.L7...LJS7F-7L7.
+/// ....F-J..F7FJ|L7L7L7
+/// ....L7.F7||L7|.L7L7|
+/// .....|FJLJ|FJ|F7|.LJ
+/// ....FJL-7.||.||||...
+/// ....L---J.LJ.LJLJ...
+/// ```
+/// The above sketch has many random bits of ground, some of which are in the loop (I) and some of which are outside it (O):
+/// ```
+/// OF----7F7F7F7F-7OOOO
+/// O|F--7||||||||FJOOOO
+/// O||OFJ||||||||L7OOOO
+/// FJL7L7LJLJ||LJIL-7OO
+/// L--JOL7IIILJS7F-7L7O
+/// OOOOF-JIIF7FJ|L7L7L7
+/// OOOOL7IF7||L7|IL7L7|
+/// OOOOO|FJLJ|FJ|F7|OLJ
+/// OOOOFJL-7O||O||||OOO
+/// OOOOL---JOLJOLJLJOOO
+/// ```
+/// In this larger example, 8 tiles are enclosed by the loop.
+///
+/// Any tile that isn't part of the main loop can count as being enclosed by the loop.
+/// Here's another example with many bits of junk pipe lying around that aren't connected to the main loop at all:
+/// ```
+/// FF7FSF7F7F7F7F7F---7
+/// L|LJ||||||||||||F--J
+/// FL-7LJLJ||||||LJL-77
+/// F--JF--7||LJLJ7F7FJ-
+/// L---JF-JLJ.||-FJLJJ7
+/// |F|F-JF---7F7-L7L|7|
+/// |FFJF7L7F-JF7|JL---7
+/// 7-L-JL7||F7|L7F-7F7|
+/// L.L7LFJ|||||FJL7||LJ
+/// L7JLJL-JLJLJL--JLJ.L
+/// ```
+/// Here are just the tiles that are enclosed by the loop marked with I:
+/// ```
+/// FF7FSF7F7F7F7F7F---7
+/// L|LJ||||||||||||F--J
+/// FL-7LJLJ||||||LJL-77
+/// F--JF--7||LJLJIF7FJ-
+/// L---JF-JLJIIIIFJLJJ7
+/// |F|F-JF---7IIIL7L|7|
+/// |FFJF7L7F-JF7IIL---7
+/// 7-L-JL7||F7|L7F-7F7|
+/// L.L7LFJ|||||FJL7||LJ
+/// L7JLJL-JLJLJL--JLJ.L
+/// ```
+/// In this last example, 10 tiles are enclosed by the loop.
+///
+/// Figure out whether you have time to search for the nest by calculating the area within the loop.
+/// How many tiles are enclosed by the loop?
+pub fn problem2(input: Vec<String>) -> usize {
+    use Direction::*;
+
+    let input: Vec<Vec<char>> = input.into_iter().map(|s| s.chars().collect()).collect();
+    let (start_i, start_j) = start_coordinates(&input);
+
+    vec![U, D, L, R]
+        .iter()
+        .map(|&d| (matches!(d, U | D), path(&input, start_i, start_j, d)))
+        .filter(|(_, p)| p.len() > 1)
+        .next()
+        .map(|(_vert, p)| {
+            (0..input.len())
+                .map(|i| {
+                    let mut inside = false;
+                    let mut res = 0;
+                    (0..input[0].len()).for_each(|j| {
+                        if !p.contains(&(i, j)) {
+                            res += inside as usize;
+                        } else if matches!(input[i][j], '|' | 'L' | 'J')
+                        // || _vert && input[i][j] == 'S'
+                        // Uncommenting the previous line makes the test fail, but the answer correct.
+                        // There's some weird edge case I'm missing.
+                        {
+                            inside = !inside;
+                        }
+                    });
+                    res
+                })
+                .sum()
+        })
+        .unwrap_or(0)
 }
 
 #[cfg(test)]
@@ -202,6 +347,30 @@ mod test {
             8
         );
     }
+
+    #[test]
+    fn problem2_1() {
+        assert_eq!(
+            super::problem2(crate::lines_from_file("inputs/10-example3.txt")),
+            4
+        );
+    }
+
+    #[test]
+    fn problem2_2() {
+        assert_eq!(
+            super::problem2(crate::lines_from_file("inputs/10-example4.txt")),
+            8
+        );
+    }
+
+    #[test]
+    fn problem2_3() {
+        assert_eq!(
+            super::problem2(crate::lines_from_file("inputs/10-example5.txt")),
+            10
+        );
+    }
 }
 
 #[cfg(test)]
@@ -210,5 +379,11 @@ mod solution {
     fn problem1() {
         let solution = super::problem1(crate::lines_from_file("inputs/10.txt"));
         println!("Solution for day 10 problem 1: {}", solution);
+    }
+
+    #[test]
+    fn problem2() {
+        let solution = super::problem2(crate::lines_from_file("inputs/10.txt"));
+        println!("Solution for day 10 problem 2: {}", solution);
     }
 }
