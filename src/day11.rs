@@ -108,6 +108,28 @@
 /// Expand the universe, then find the length of the shortest path between every pair of galaxies.
 /// What is the sum of these lengths?
 pub fn problem1(input: Vec<String>) -> usize {
+    solve(input, 2)
+}
+
+/// The galaxies are much older (and thus much farther apart) than the researcher initially estimated.
+///
+/// Now, instead of the expansion you did before, make each empty row or column one million times larger.
+/// That is, each empty row should be replaced with 1000000 empty rows,
+/// and each empty column should be replaced with 1000000 empty columns.
+///
+/// (In the example above, if each empty row or column were merely 10 times larger,
+/// the sum of the shortest paths between every pair of galaxies would be 1030.
+/// If each empty row or column were merely 100 times larger,
+/// the sum of the shortest paths between every pair of galaxies would be 8410.
+/// However, your universe will need to expand far beyond these values.)
+///
+/// Starting with the same initial image, expand the universe according to these new rules,
+/// then find the length of the shortest path between every pair of galaxies. What is the sum of these lengths?
+pub fn problem2(input: Vec<String>) -> usize {
+    solve(input, 1_000_000)
+}
+
+fn solve(input: Vec<String>, distance: usize) -> usize {
     let universe: Vec<Vec<char>> = input
         .into_iter()
         .map(|line| line.chars().collect())
@@ -132,18 +154,22 @@ pub fn problem1(input: Vec<String>) -> usize {
         .filter(|&i| universe[i].iter().all(|&c| c == '.'))
         .rev()
         .for_each(|row| {
-            galaxies
-                .iter_mut()
-                .for_each(|(x, _)| *x += (*x > row) as usize)
+            galaxies.iter_mut().for_each(|(x, _)| {
+                if *x > row {
+                    *x += distance - 1
+                }
+            })
         });
 
     (0..universe[0].len())
         .filter(|&j| (0..len).all(|i| universe[i][j] == '.'))
         .rev()
         .for_each(|col| {
-            galaxies
-                .iter_mut()
-                .for_each(|(_, y)| *y += (*y > col) as usize)
+            galaxies.iter_mut().for_each(|(_, y)| {
+                if *y > col {
+                    *y += distance - 1
+                }
+            })
         });
 
     galaxies
@@ -168,6 +194,22 @@ mod test {
             374
         );
     }
+
+    #[test]
+    fn problem2_1() {
+        assert_eq!(
+            super::solve(crate::lines_from_file("inputs/11-example.txt"), 10),
+            1030
+        );
+    }
+
+    #[test]
+    fn problem2_2() {
+        assert_eq!(
+            super::solve(crate::lines_from_file("inputs/11-example.txt"), 100),
+            8410
+        );
+    }
 }
 
 #[cfg(test)]
@@ -176,5 +218,11 @@ mod solution {
     fn problem1() {
         let solution = super::problem1(crate::lines_from_file("inputs/11.txt"));
         println!("Solution for day 11 problem 1: {}", solution);
+    }
+
+    #[test]
+    fn problem2() {
+        let solution = super::problem2(crate::lines_from_file("inputs/11.txt"));
+        println!("Solution for day 11 problem 2: {}", solution);
     }
 }
